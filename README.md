@@ -1,4 +1,4 @@
-# 🚀 Blog API Project
+# 🚀 Blog Website Project
 
 A powerful, feature-rich Blog Application backend built with **Django** and **Django Rest Framework (DRF)**. This project provides a robust API for content management, user interactions, and authentication, designed to be scalable and developer-friendly.
 
