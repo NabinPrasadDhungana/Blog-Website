@@ -6,7 +6,7 @@ from baseapp.models import Category, Blog, Comment, Like
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
-        required=True,
+        required=False,  # Not required for updates
         style={'input_type': 'password', 'placeholder': 'Password'},
         validators=[RegexValidator(
             regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*-])[A-Za-z\d!@#$%^&*-]{8,32}$',
@@ -21,6 +21,19 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
 
         return user
+    
+    def update(self, instance, validated_data):
+        # Handle password separately if provided
+        password = validated_data.pop('password', None)
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        if password:
+            instance.set_password(password)
+        
+        instance.save()
+        return instance
 
 class CategorySerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(read_only=True)
