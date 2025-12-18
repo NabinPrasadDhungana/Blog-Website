@@ -1,14 +1,11 @@
 from rest_framework import permissions
 
-class IsOwner(permissions.BasePermission):
+class IsSelf(permissions.BasePermission):
     """
-    Object-level permission to only allow owners of an object to edit it.
-    Assumes the model instance has an `owner` attribute.
-    """
-
+    Object-level permission to only allow the user to update themselves.
+    Used for confirming that the user sending the request is same as the user object that is going to be updated.
+    """    
     def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD or OPTIONS requests.
         if request.method in permissions.SAFE_METHODS:
             return True
 
@@ -16,7 +13,7 @@ class IsOwner(permissions.BasePermission):
             return False
         return obj == request.user
     
-class IsOwnerOrAdmin(IsOwner):
+class IsSelfOrAdmin(IsSelf):
     """
     Permission is allowed if the user that is requesting is either the owner or an admin.
     """
