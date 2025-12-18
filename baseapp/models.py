@@ -10,8 +10,8 @@ class Category(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = self.name.lower().replace(" ", "-")
+        # if not self.slug:
+        self.slug = self.name.lower().replace(" ", "-")
         super().save(*args, **kwargs)
 
 
