@@ -1,4 +1,4 @@
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, RetrieveUpdateAPIView, DestroyAPIView
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
@@ -6,7 +6,7 @@ from accounts.models import User
 from baseapp.models import Category, Blog, Comment, Like
 from .serializers import UserSerializer, CategorySerializer, BlogSerializer, CommentSerializer, LikeSerializer
 from .filters import BlogFilter
-from .permissions import IsOwner
+from .permissions import IsOwner, IsOwnerOrAdmin
 from django.contrib.auth import authenticate, login
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -46,6 +46,10 @@ class UserUpdateAPIView(RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsOwner]
+
+class UserDeleteAPIView(DestroyAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
     
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()

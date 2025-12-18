@@ -12,6 +12,16 @@ class IsOwner(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Instance must have an attribute named `owner`.
-        print(obj)
+        if not request.user or not request.user.is_authenticated:
+            return False
         return obj == request.user
+    
+class IsOwnerOrAdmin(IsOwner):
+    """
+    Permission is allowed if the user that is requesting is either the owner or an admin.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if request.user and request.user.is_authenticated and request.user.is_staff:
+            return True
+        return super().has_object_permission(request, view, obj)
