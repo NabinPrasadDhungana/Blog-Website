@@ -28,8 +28,7 @@ class Blog(models.Model):
         return self.title
     
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = self.title.lower().replace(" ", "-")
+        self.slug = self.title.lower().replace(" ", "-")
         super().save(*args, **kwargs)
 
 class Comment(models.Model):

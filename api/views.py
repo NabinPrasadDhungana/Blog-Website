@@ -1,31 +1,31 @@
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, RetrieveUpdateAPIView, DestroyAPIView
+from rest_framework.generics import ListCreateAPIView, CreateAPIView, ListAPIView, RetrieveAPIView, RetrieveUpdateAPIView, DestroyAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny, SAFE_METHODS
 from accounts.models import User
 from baseapp.models import Category, Blog, Comment, Like
 from .serializers import UserSerializer, CategorySerializer, BlogSerializer, CommentSerializer, LikeSerializer
 from .filters import BlogFilter
-from .permissions import IsOwner, IsOwnerOrAdmin
+from .permissions import IsSelf, IsSelfOrAdmin, IsOwnerOrAdmin
 from django.contrib.auth import authenticate, login
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
 # Create your views here.
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UserViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
-    def get_permissions(self):
-        if self.request.method in ['GET', 'PUT', 'PATCH']:
-            return [IsAuthenticated()]
-        if self.request.method == 'POST':
-            return [AllowAny()]
-        elif self.request.method == 'DELETE':
-            return [IsAdminUser()]
-        else:
-            return [AllowAny()]
+#     def get_permissions(self):
+#         if self.request.method in ['GET', 'PUT', 'PATCH']:
+#             return [IsAuthenticated()]
+#         if self.request.method == 'POST':
+#             return [AllowAny()]
+#         elif self.request.method == 'DELETE':
+#             return [IsAdminUser()]
+#         else:
+#             return [AllowAny()]
         
 class UserCreateAPIView(CreateAPIView):
     queryset = User.objects.all()
@@ -37,29 +37,49 @@ class UserListAPIView(ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
 
-class UserRetrieveAPIView(RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+# class UserRetrieveAPIView(RetrieveAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [AllowAny]
 
 class UserUpdateAPIView(RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, IsOwner]
+    permission_classes = [IsSelfOrAdmin]
 
 class UserDeleteAPIView(DestroyAPIView):
     queryset = User.objects.all()
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    serializer_class = UserSerializer
+    permission_classes = [IsSelfOrAdmin]
     
-class CategoryViewSet(viewsets.ModelViewSet):
+# class CategoryViewSet(viewsets.ModelViewSet):
+#     queryset = Category.objects.all()
+#     serializer_class = CategorySerializer
+
+#     def get_permissions(self):
+#         if self.request.method == 'GET':
+#             return [AllowAny()]
+#         else:
+#             return [IsAdminUser()]
+        
+class CategoryListAPIView(ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'slug'
 
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        else:
-            return [IsAdminUser()]
+class CategoryCreateAPIView(CreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAdminUser]
+    lookup_field = 'slug'
+
+class CategoryRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAdminUser]
+    lookup_field = 'slug'
+    lookup_url_kwarg = 'slug'
         
 class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
@@ -77,6 +97,33 @@ class BlogViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+class BlogListCreateAPIView(ListCreateAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    filterset_class = BlogFilter
+    search_fields = ['title', 'description']
+    ordering_fields = ['created_at', 'updated_at']
+    ordering = ['created_at']
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        
+        return [IsAuthenticated()]
+    
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class BlogUpdateRetrieveDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsOwnerOrAdmin()]
+        
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()

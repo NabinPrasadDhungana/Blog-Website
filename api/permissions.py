@@ -22,3 +22,13 @@ class IsSelfOrAdmin(IsSelf):
         if request.user and request.user.is_authenticated and request.user.is_staff:
             return True
         return super().has_object_permission(request, view, obj)
+    
+class IsOwnerOrAdmin(permissions.BasePermission):
+    """
+    Object-level permission to only allow the owners of an object to work on it.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        return obj.author.username == request.user.username or request.user.is_staff

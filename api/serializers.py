@@ -46,12 +46,12 @@ class BlogSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(read_only=True)
     author = serializers.SerializerMethodField()
 
-    def get_author(self, obj):
+    def get_author(self, obj) -> dict:
         return {
             "username": obj.author.username,
             "name": obj.author.name,
             "avatar": obj.author.avatar.url if obj.author.avatar else None
-        }
+        } or obj.author
     category = serializers.CharField()
     likes_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
@@ -60,10 +60,10 @@ class BlogSerializer(serializers.ModelSerializer):
         model = Blog
         fields = ['id', 'title', 'slug', 'description', 'image', 'author', 'category', 'created_at', 'updated_at', 'likes_count', 'is_liked']
 
-    def get_likes_count(self, obj):
+    def get_likes_count(self, obj) -> int:
         return obj.likes.count()
 
-    def get_is_liked(self, obj):
+    def get_is_liked(self, obj) -> bool:
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.likes.filter(user=request.user).exists()
