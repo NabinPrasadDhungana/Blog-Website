@@ -33,6 +33,10 @@ urlpatterns = [
     #comment
     path('comments/', views.CommentListCreateAPIView.as_view(), name='list_create_comment'),
     path('comment/<int:pk>', views.CommentRetrieveUpdateDestroyAPIView.as_view(), name='retrieve_comment'),
+
+    #like
+    path('likes/', views.LikeListCreateAPIView.as_view(), name='list_create_like'),
+    path('like/<int:pk>', views.LikeRetrieveUpdateDestroyAPIView.as_view(), name='retrieve_like'),
     
 ]
 

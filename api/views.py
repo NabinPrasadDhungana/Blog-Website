@@ -178,6 +178,28 @@ class LikeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+class LikeListCreateAPIView(ListCreateAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    filterset_fields = ['blog']
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class LikeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [IsAuthenticated()]
+        return [IsOwnerOrAdmin()]
+
 class SessionLoginView(APIView):
     permission_classes = [AllowAny]
 
