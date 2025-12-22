@@ -100,8 +100,8 @@ function createPostElement(post) {
             </a>
             <p class="post-text">
                 ${post.description.length > 200
-                    ? escapeHtml(post.description.substring(0, 200)) + '... <a href="/baseapp/blog/' + post.slug + '/" class="read-more-link" style="color:#007bff;text-decoration:underline;">Read more</a>'
-                    : escapeHtml(post.description)}
+            ? escapeHtml(post.description.substring(0, 200)) + '... <a href="/baseapp/blog/' + post.slug + '/" class="read-more-link" style="color:#007bff;text-decoration:underline;">Read more</a>'
+            : escapeHtml(post.description)}
             </p>
             ${post.image ? `<a href="/baseapp/blog/${post.slug}/"><img src="${post.image}" alt="Post image" class="post-image rounded"></a>` : ''}
         </div>
@@ -401,7 +401,7 @@ async function showEditPostModal(postId) {
 
     try {
         // Fetch post details
-        const response = await TokenManager.authenticatedFetch(`/api/blogs/${postId}/`);
+        const response = await TokenManager.authenticatedFetch(`/api/blog/${postId}/`);
         if (response.ok) {
             const post = await response.json();
 
@@ -461,7 +461,7 @@ async function handleSubmitPost() {
         let response;
         if (postId) {
             // Update existing post
-            response = await TokenManager.authenticatedFetch(`/api/blogs/${postId}/`, {
+            response = await TokenManager.authenticatedFetch(`/api/blog/${postId}/`, {
                 method: 'PATCH',
                 body: formData
             });
@@ -502,7 +502,7 @@ async function handleConfirmDelete() {
     if (!currentDeletePostId) return;
 
     try {
-        const response = await TokenManager.authenticatedFetch(`/api/blogs/${currentDeletePostId}/`, {
+        const response = await TokenManager.authenticatedFetch(`/api/blog/${currentDeletePostId}/`, {
             method: 'DELETE'
         });
 

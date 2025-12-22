@@ -38,7 +38,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const form = e.target;
     const formData = new FormData(form);
 
-    const response = await fetch('/api/users/', {
+    const response = await fetch('/api/user/create/', {
         method: 'POST',
         body: formData
     });

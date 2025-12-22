@@ -76,7 +76,7 @@
                                     <button class="btn btn-outline-primary" onclick="editCategory({{ category.id }}, '{{ category.name|escapejs }}', '{{ category.slug }}')" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-outline-danger" onclick="deleteCategory({{ category.id }}, '{{ category.name|escapejs }}', {{ category.blog_count }})" title="Delete">
+                                    <button class="btn btn-outline-danger" onclick="deleteCategory('{{ category.slug }}', '{{ category.name|escapejs }}', {{ category.blog_count }})" title="Delete">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -105,6 +105,7 @@
             <div class="modal-body">
                 <form id="editCategoryForm">
                     <input type="hidden" id="editCategoryId">
+                    <input type="hidden" id="editCategoryOriginalSlug">
                     <div class="mb-3">
                         <label for="editCategoryName" class="form-label">Category Name</label>
                         <input type="text" class="form-control" id="editCategoryName" required>

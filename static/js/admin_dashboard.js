@@ -11,7 +11,7 @@ async function toggleUserStatus(userId, activate) {
 
     try {
         const token = TokenManager.getAccessToken();
-        const response = await fetch(`/api/users/${userId}/`, {
+        const response = await fetch(`/api/user/update/${userId}/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ async function deleteBlog(blogId, blogTitle) {
 
     try {
         const token = TokenManager.getAccessToken();
-        const response = await fetch(`/api/blogs/${blogId}/`, {
+        const response = await fetch(`/api/blog/${blogId}/`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 const token = TokenManager.getAccessToken();
-                const response = await fetch('/api/categories/', {
+                const response = await fetch('/api/category/create/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -104,6 +104,7 @@ function editCategory(categoryId, categoryName, categorySlug) {
     document.getElementById('editCategoryId').value = categoryId;
     document.getElementById('editCategoryName').value = categoryName;
     document.getElementById('editCategorySlug').value = categorySlug;
+    document.getElementById('editCategoryOriginalSlug').value = categorySlug;
 
     const modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
     modal.show();
@@ -114,10 +115,11 @@ async function saveCategory() {
     const categoryId = document.getElementById('editCategoryId').value;
     const name = document.getElementById('editCategoryName').value;
     const slug = document.getElementById('editCategorySlug').value;
+    const originalSlug = document.getElementById('editCategoryOriginalSlug').value;
 
     try {
         const token = TokenManager.getAccessToken();
-        const response = await fetch(`/api/categories/${categoryId}/`, {
+        const response = await fetch(`/api/category/${originalSlug}/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -139,7 +141,7 @@ async function saveCategory() {
 }
 
 // Delete category
-async function deleteCategory(categoryId, categoryName, blogCount) {
+async function deleteCategory(categorySlug, categoryName, blogCount) {
     let confirmMsg = `Are you sure you want to delete the category "${categoryName}"?`;
     if (blogCount > 0) {
         confirmMsg += `\n\nWarning: This category has ${blogCount} blog(s). Deleting it may affect those blogs.`;
@@ -151,7 +153,7 @@ async function deleteCategory(categoryId, categoryName, blogCount) {
 
     try {
         const token = TokenManager.getAccessToken();
-        const response = await fetch(`/api/categories/${categoryId}/`, {
+        const response = await fetch(`/api/category/${categorySlug}/`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -179,7 +181,7 @@ async function deleteComment(commentId) {
 
     try {
         const token = TokenManager.getAccessToken();
-        const response = await fetch(`/api/comments/${commentId}/`, {
+        const response = await fetch(`/api/comment/${commentId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
