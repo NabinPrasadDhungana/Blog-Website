@@ -81,22 +81,22 @@ class CategoryRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
     lookup_url_kwarg = 'slug'
         
-class BlogViewSet(viewsets.ModelViewSet):
-    queryset = Blog.objects.all()
-    serializer_class = BlogSerializer
-    filterset_class = BlogFilter
-    search_fields = ['title', 'description']
-    ordering_fields = ['created_at', 'updated_at']
-    ordering = ['created_at']
+# class BlogViewSet(viewsets.ModelViewSet):
+#     queryset = Blog.objects.all()
+#     serializer_class = BlogSerializer
+#     filterset_class = BlogFilter
+#     search_fields = ['title', 'description']
+#     ordering_fields = ['created_at', 'updated_at']
+#     ordering = ['created_at']
 
-    def get_permissions(self):
-        if self.request.method in ['POST', 'PATCH', 'DELETE', 'PUT']:
-            return [IsAuthenticated()]
-        else:
-            return [AllowAny()]
+#     def get_permissions(self):
+#         if self.request.method in ['POST', 'PATCH', 'DELETE', 'PUT']:
+#             return [IsAuthenticated()]
+#         else:
+#             return [AllowAny()]
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+#     def perform_create(self, serializer):
+#         serializer.save(author=self.request.user)
 
 class BlogListCreateAPIView(ListCreateAPIView):
     queryset = Blog.objects.all()
@@ -125,18 +125,18 @@ class BlogUpdateRetrieveDestroyAPIView(RetrieveUpdateDestroyAPIView):
         return [IsOwnerOrAdmin()]
         
 
-class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-    filterset_fields = ['blog']
+# class CommentViewSet(viewsets.ModelViewSet):
+#     queryset = Comment.objects.all()
+#     serializer_class = CommentSerializer
+#     filterset_fields = ['blog']
 
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            return [IsAuthenticated()]
-        return [AllowAny()]
+#     def get_permissions(self):
+#         if self.request.method == 'POST':
+#             return [IsAuthenticated()]
+#         return [AllowAny()]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+#     def perform_create(self, serializer):
+#         serializer.save(user=self.request.user)
 
 class CommentListCreateAPIView(ListCreateAPIView):
     queryset = Comment.objects.all()
@@ -160,20 +160,20 @@ class CommentRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
             return [IsAuthenticated()]
         return [IsOwnerOrAdmin()]
 
-class LikeViewSet(viewsets.ModelViewSet):
-    queryset = Like.objects.all()
-    serializer_class = LikeSerializer
-    permission_classes = [IsAuthenticated]
+# class LikeViewSet(viewsets.ModelViewSet):
+#     queryset = Like.objects.all()
+#     serializer_class = LikeSerializer
+#     permission_classes = [IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        blog_id = request.data.get('blog')
-        if blog_id:
-            existing_like = Like.objects.filter(user=request.user, blog=blog_id).first()
-            if existing_like:
-                existing_like.delete()
-                return Response({'status': 'unliked'}, status=status.HTTP_200_OK)
+#     def create(self, request, *args, **kwargs):
+#         blog_id = request.data.get('blog')
+#         if blog_id:
+#             existing_like = Like.objects.filter(user=request.user, blog=blog_id).first()
+#             if existing_like:
+#                 existing_like.delete()
+#                 return Response({'status': 'unliked'}, status=status.HTTP_200_OK)
         
-        return super().create(request, *args, **kwargs)
+#         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -188,6 +188,16 @@ class LikeListCreateAPIView(ListCreateAPIView):
             return [AllowAny()]
         return [IsAuthenticated()]
     
+    def create(self, request, *args, **kwargs):
+        blog_id = request.data.get('blog')
+        if blog_id:
+            existing_like = Like.objects.filter(user=request.user, blog=blog_id).first()
+            if existing_like:
+                existing_like.delete()
+                return Response({'status': 'unliked'}, status=status.HTTP_200_OK)
+        
+        return super().create(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 

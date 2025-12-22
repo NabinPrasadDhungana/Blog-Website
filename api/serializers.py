@@ -51,10 +51,14 @@ class BlogSerializer(serializers.ModelSerializer):
         )
     likes_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Blog
-        fields = ['id', 'title', 'slug', 'description', 'image', 'author', 'category', 'created_at', 'updated_at', 'likes_count', 'is_liked']
+        fields = ['id', 'title', 'slug', 'description', 'image', 'author', 'category', 'created_at', 'updated_at', 'likes_count', 'comments_count', 'is_liked']
+
+    def get_comments_count(self, obj) -> int:
+        return obj.comments.count()
 
     def get_author(self, obj) -> dict:
         if not obj.author:
