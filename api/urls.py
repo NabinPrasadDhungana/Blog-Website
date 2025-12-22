@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from .views import SessionLoginView#,UserViewSet, CategoryViewSet, BlogViewSet, CommentViewSet, LikeViewSet, 
-from .views import UserCreateAPIView, UserListAPIView, UserUpdateAPIView, UserDeleteAPIView#, UserRetrieveAPIView
+from .views import UserCreateAPIView, UserListAPIView, UserUpdateAPIView, UserDeleteAPIView, CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView#, UserRetrieveAPIView
 from . import views
 
 # router = DefaultRouter()
@@ -29,6 +29,10 @@ urlpatterns = [
     #blog
     path('blogs/', views.BlogListCreateAPIView.as_view(), name='create_blog'),
     path('blog/<int:pk>/', views.BlogUpdateRetrieveDestroyAPIView.as_view(), name='update_retrieve_delete_blog)'),
+
+    #comment
+    path('comments/', views.CommentListCreateAPIView.as_view(), name='list_create_comment'),
+    path('comment/<int:pk>', views.CommentRetrieveUpdateDestroyAPIView.as_view(), name='retrieve_comment'),
     
 ]
 
