@@ -31,4 +31,7 @@ class IsOwnerOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if not request.user or not request.user.is_authenticated:
             return False
+        
+        if hasattr(obj, 'user'):
+            return obj.user.username == request.user.username or request.user.is_staff
         return obj.author.username == request.user.username or request.user.is_staff
