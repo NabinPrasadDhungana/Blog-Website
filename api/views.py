@@ -253,7 +253,7 @@ class BlogListCreateAPIView(APIView):
     
     def get(self, request):
         blogs = Blog.objects.all()
-        serializer = BlogSerializer(blogs, many=True)
+        serializer = BlogSerializer(blogs, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
@@ -273,7 +273,7 @@ class BlogDetailAPIView(APIView):
     
     def get(self, request, pk):
         blog = get_object_or_404(Blog, pk=pk)
-        serializer = BlogSerializer(blog)
+        serializer = BlogSerializer(blog, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def put(self, request, pk):
