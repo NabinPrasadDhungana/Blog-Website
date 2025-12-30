@@ -37,8 +37,8 @@ urlpatterns = [
     path('blog/<int:pk>/', views.BlogDetailAPIView.as_view(), name='blog-detail'),
 
     #comment
-    path('comments/', views.CommentListCreateAPIView.as_view(), name='list_create_comment'),
-    path('comment/<int:pk>', views.CommentRetrieveUpdateDestroyAPIView.as_view(), name='retrieve_comment'),
+    path('comments/', views.CommentListCreateAPIView.as_view(), name='comment-list-create'),
+    path('comment/<int:pk>', views.CommentDetailAPIView.as_view(), name='comment-detail'),
 
     #like
     path('likes/', views.LikeListCreateAPIView.as_view(), name='list_create_like'),
