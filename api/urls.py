@@ -42,7 +42,6 @@ urlpatterns = [
 
     #like
     path('likes/', views.LikeListCreateAPIView.as_view(), name='list_create_like'),
-    path('like/<int:pk>', views.LikeRetrieveUpdateDestroyAPIView.as_view(), name='retrieve_like'),
     
 ]
 

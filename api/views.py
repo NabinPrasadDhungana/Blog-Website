@@ -401,20 +401,55 @@ class CommentRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         
 #         return super().create(request, *args, **kwargs)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    # def perform_create(self, serializer):
+    #     serializer.save(user=self.request.user)
 
-class LikeListCreateAPIView(ListCreateAPIView):
-    queryset = Like.objects.all()
-    serializer_class = LikeSerializer
-    filterset_fields = ['blog']
+# class LikeListCreateAPIView(ListCreateAPIView):
+#     queryset = Like.objects.all()
+#     serializer_class = LikeSerializer
+#     filterset_fields = ['blog']
 
+#     def get_permissions(self):
+#         if self.request.method in SAFE_METHODS:
+#             return [AllowAny()]
+#         return [IsAuthenticated()]
+    
+#     def create(self, request, *args, **kwargs):
+#         blog_id = request.data.get('blog')
+#         if blog_id:
+#             existing_like = Like.objects.filter(user=request.user, blog=blog_id).first()
+#             if existing_like:
+#                 existing_like.delete()
+#                 return Response({'status': 'unliked'}, status=status.HTTP_200_OK)
+        
+#         return super().create(request, *args, **kwargs)
+
+#     def perform_create(self, serializer):
+#         serializer.save(user=self.request.user)
+
+# class LikeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+#     queryset = Like.objects.all()
+#     serializer_class = LikeSerializer
+    
+#     def get_permissions(self):
+#         if self.request.method in SAFE_METHODS:
+#             return [IsAuthenticated()]
+#         return [IsOwnerOrAdmin()]
+    
+class LikeListCreateAPIView(APIView):
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
+            self.permission_classes = [AllowAny]
+        elif self.request.method == 'POST':
+            self.permission_classes = [IsAuthenticated]
+        return super().get_permissions()
     
-    def create(self, request, *args, **kwargs):
+    def get(self, request):
+        likes = Like.objects.all()
+        serializer = LikeSerializer(likes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
         blog_id = request.data.get('blog')
         if blog_id:
             existing_like = Like.objects.filter(user=request.user, blog=blog_id).first()
@@ -422,19 +457,11 @@ class LikeListCreateAPIView(ListCreateAPIView):
                 existing_like.delete()
                 return Response({'status': 'unliked'}, status=status.HTTP_200_OK)
         
-        return super().create(request, *args, **kwargs)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-class LikeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Like.objects.all()
-    serializer_class = LikeSerializer
-    
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [IsAuthenticated()]
-        return [IsOwnerOrAdmin()]
+        serializer = LikeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SessionLoginView(APIView):
     permission_classes = [AllowAny]
