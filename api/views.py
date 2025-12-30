@@ -33,25 +33,26 @@ from rest_framework_simplejwt.tokens import RefreshToken
 #     serializer_class = UserSerializer
 #     permission_classes = [AllowAny]
 
-class UserAPIView(APIView):
-    
+class UserListCreateAPIView(APIView):
+    # def get_permissions(self):
+    #     if self.request.method == 'GET':
+    #         return [AllowAny()]
+    #     elif self.request.method in ['PUT', 'PATCH']:
+    #         return [IsSelfOrAdmin()]
+    #     elif self.request.method == 'DELETE':
+    #         return [IsAdminUser()]
+    #     else:
+    #         return [AllowAny()]
     def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        elif self.request.method in ['PUT', 'PATCH']:
-            return [IsSelfOrAdmin()]
-        elif self.request.method == 'DELETE':
-            return [IsAdminUser()]
-        else:
-            return [AllowAny()]
-        
-    def get(self, request, pk=None):
-        if pk:
-            user = get_object_or_404(User, pk=pk)
-            serializer = UserSerializer(user)
-        else:
-            users = User.objects.all()
-            serializer = UserSerializer(users, many=True)
+        if self.request.method == 'POST':
+            self.permission_classes = [AllowAny]
+        elif self.request.method == 'GET':
+            self.permission_classes == [IsAdminUser]
+        return super().get_permissions()
+            
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
@@ -60,6 +61,21 @@ class UserAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserDetailAPIView(APIView):
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes == [AllowAny]
+        elif self.request.method in ['PUT', 'PATCH']:
+            self.permission_classes = [IsSelfOrAdmin]
+        elif self.request.method == 'DELETE':
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()
+    
+    def get(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         user = get_object_or_404(User, pk=pk)
