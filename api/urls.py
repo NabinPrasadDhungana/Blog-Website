@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from .views import SessionLoginView#, UserAPIView,UserViewSet, CategoryViewSet, BlogViewSet, CommentViewSet, LikeViewSet, 
-from .views import UserListCreateAPIView, UserDetailAPIView, CategoryListCreateAPIView, CategoryDetailAPIView#, UserUpdateAPIView, UserDeleteAPIView, CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView#, UserRetrieveAPIView
+from .views import UserListCreateAPIView, UserDetailAPIView, CategoryListCreateAPIView, CategoryDetailAPIView, BlogListCreateAPIView, BlogDetailAPIView
 from . import views
 
 # router = DefaultRouter()
@@ -31,8 +31,10 @@ urlpatterns = [
     path('category/<slug:slug>/', CategoryDetailAPIView.as_view(), name='category-detail'),
 
     #blog
-    path('blogs/', views.BlogListCreateAPIView.as_view(), name='create_blog'),
-    path('blog/<int:pk>/', views.BlogUpdateRetrieveDestroyAPIView.as_view(), name='update_retrieve_delete_blog)'),
+    # path('blogs/', views.BlogListCreateAPIView.as_view(), name='create_blog'),
+    # path('blog/<int:pk>/', views.BlogUpdateRetrieveDestroyAPIView.as_view(), name='update_retrieve_delete_blog)'),
+    path('blogs/', views.BlogListCreateAPIView.as_view(), name='blog-list-create'),
+    path('blog/<int:pk>/', views.BlogDetailAPIView.as_view(), name='blog-detail'),
 
     #comment
     path('comments/', views.CommentListCreateAPIView.as_view(), name='list_create_comment'),

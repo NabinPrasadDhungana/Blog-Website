@@ -217,32 +217,85 @@ class CategoryDetailAPIView(APIView):
 #     def perform_create(self, serializer):
 #         serializer.save(author=self.request.user)
 
-class BlogListCreateAPIView(ListCreateAPIView):
-    queryset = Blog.objects.all()
-    serializer_class = BlogSerializer
-    filterset_class = BlogFilter
-    search_fields = ['title', 'description']
-    ordering_fields = ['created_at', 'updated_at']
-    ordering = ['created_at']
+# class BlogListCreateAPIView(ListCreateAPIView):
+#     queryset = Blog.objects.all()
+#     serializer_class = BlogSerializer
+#     filterset_class = BlogFilter
+#     search_fields = ['title', 'description']
+#     ordering_fields = ['created_at', 'updated_at']
+#     ordering = ['created_at']
 
+#     def get_permissions(self):
+#         if self.request.method in SAFE_METHODS:
+#             return [AllowAny()]
+        
+#         return [IsAuthenticated()]
+    
+#     def perform_create(self, serializer):
+#         serializer.save(author=self.request.user)
+
+# class BlogUpdateRetrieveDestroyAPIView(RetrieveUpdateDestroyAPIView):
+#     queryset = Blog.objects.all()
+#     serializer_class = BlogSerializer
+    
+#     def get_permissions(self):
+#         if self.request.method in SAFE_METHODS:
+#             return [AllowAny()]
+#         return [IsOwnerOrAdmin()]
+        
+class BlogListCreateAPIView(APIView):
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        
-        return [IsAuthenticated()]
+            self.permission_classes = [AllowAny]
+        elif self.request.method == 'POST':
+            self.permission_classes = [IsAuthenticated]
+        return super().get_permissions()
     
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-class BlogUpdateRetrieveDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Blog.objects.all()
-    serializer_class = BlogSerializer
+    def get(self, request):
+        blogs = Blog.objects.all()
+        serializer = BlogSerializer(blogs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
+    def post(self, request):
+        serializer = BlogSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(author=self.request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class BlogDetailAPIView(APIView):
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsOwnerOrAdmin()]
-        
+            self.permission_classes = [AllowAny]
+        elif self.request.method in ['PUT', 'PATCH', 'DELETE']:
+            self.permission_classes = [IsOwnerOrAdmin]
+        return super().get_permissions()
+    
+    def get(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        serializer = BlogSerializer(blog)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def put(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        serializer = BlogSerializer(blog, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        serializer = BlogSerializer(blog, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        blog.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # class CommentViewSet(viewsets.ModelViewSet):
 #     queryset = Comment.objects.all()
