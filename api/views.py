@@ -8,6 +8,7 @@ from .serializers import UserSerializer, CategorySerializer, BlogSerializer, Com
 from .filters import BlogFilter
 from .permissions import IsSelf, IsSelfOrAdmin, IsOwnerOrAdmin
 from django.contrib.auth import authenticate, login
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -27,30 +28,78 @@ from rest_framework_simplejwt.tokens import RefreshToken
 #         else:
 #             return [AllowAny()]
         
-class UserCreateAPIView(CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+# class UserCreateAPIView(CreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [AllowAny]
 
-class UserListAPIView(ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAdminUser]
+class UserAPIView(APIView):
+    
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        elif self.request.method in ['PUT', 'PATCH']:
+            return [IsSelfOrAdmin()]
+        elif self.request.method == 'DELETE':
+            return [IsAdminUser()]
+        else:
+            return [AllowAny()]
+        
+    def get(self, request, pk=None):
+        if pk:
+            user = get_object_or_404(User, pk=pk)
+            serializer = UserSerializer(user)
+        else:
+            users = User.objects.all()
+            serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        serializer = UserSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# class UserListAPIView(ListAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [IsAdminUser]
 
 # class UserRetrieveAPIView(RetrieveAPIView):
 #     queryset = User.objects.all()
 #     serializer_class = UserSerializer
 #     permission_classes = [AllowAny]
 
-class UserUpdateAPIView(RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsSelfOrAdmin]
+# class UserUpdateAPIView(RetrieveUpdateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [IsSelfOrAdmin]
 
-class UserDeleteAPIView(DestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsSelfOrAdmin]
+# class UserDeleteAPIView(DestroyAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [IsSelfOrAdmin]
     
 # class CategoryViewSet(viewsets.ModelViewSet):
 #     queryset = Category.objects.all()

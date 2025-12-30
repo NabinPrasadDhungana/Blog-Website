@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from .views import SessionLoginView#,UserViewSet, CategoryViewSet, BlogViewSet, CommentViewSet, LikeViewSet, 
-from .views import UserCreateAPIView, UserListAPIView, UserUpdateAPIView, UserDeleteAPIView, CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView#, UserRetrieveAPIView
+from .views import SessionLoginView, UserAPIView#,UserViewSet, CategoryViewSet, BlogViewSet, CommentViewSet, LikeViewSet, 
+# from .views import UserCreateAPIView, UserListAPIView, UserUpdateAPIView, UserDeleteAPIView, CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView#, UserRetrieveAPIView
 from . import views
 
 # router = DefaultRouter()
@@ -15,11 +15,13 @@ urlpatterns = [
     path('login/', SessionLoginView.as_view(), name='api_login'),
 
     #users
-    path('user/create/', UserCreateAPIView.as_view(), name='create_user'),
-    path('users/', UserListAPIView.as_view(), name='list_users'),
+    # path('user/create/', UserCreateAPIView.as_view(), name='create_user'),
+    # path('users/', UserListAPIView.as_view(), name='list_users'),
     # path('user/<int:pk>/', UserRetrieveAPIView.as_view(), name='retrieve_user'),
-    path('user/update/<int:pk>/', UserUpdateAPIView.as_view(), name='update_user'),
-    path('user/delete/<int:pk>/', UserDeleteAPIView.as_view(), name='delete_user'),
+    # path('user/update/<int:pk>/', UserUpdateAPIView.as_view(), name='update_user'),
+    # path('user/delete/<int:pk>/', UserDeleteAPIView.as_view(), name='delete_user'),
+    path('users/', UserAPIView.as_view(), name='user-list-create'),
+    path('users/<int:pk>/', UserAPIView.as_view(), name='user-detail'),
 
     #category
     path('category/create/', views.CategoryCreateAPIView.as_view(), name='create_category'),
