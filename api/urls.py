@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from .views import SessionLoginView#, UserAPIView,UserViewSet, CategoryViewSet, BlogViewSet, CommentViewSet, LikeViewSet, 
-from .views import UserListCreateAPIView, UserDetailAPIView#, UserUpdateAPIView, UserDeleteAPIView, CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView#, UserRetrieveAPIView
+from .views import UserListCreateAPIView, UserDetailAPIView, CategoryListCreateAPIView, CategoryDetailAPIView#, UserUpdateAPIView, UserDeleteAPIView, CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView#, UserRetrieveAPIView
 from . import views
 
 # router = DefaultRouter()
@@ -24,9 +24,11 @@ urlpatterns = [
     path('user/<int:pk>/', UserDetailAPIView.as_view(), name='user-detail'),
 
     #category
-    path('category/create/', views.CategoryCreateAPIView.as_view(), name='create_category'),
-    path('categories/', views.CategoryListAPIView.as_view(), name='list_category'),
-    path('category/<slug:slug>/', views.CategoryRetrieveUpdateDestroyAPIView.as_view(), name='retrieve_update_delete_category'),
+    # path('category/create/', views.CategoryCreateAPIView.as_view(), name='create_category'),
+    # path('categories/', views.CategoryListAPIView.as_view(), name='list_category'),
+    # path('category/<slug:slug>/', views.CategoryRetrieveUpdateDestroyAPIView.as_view(), name='retrieve_update_delete_category'),
+    path('categories/', CategoryListCreateAPIView.as_view(), name='category-list-create'),
+    path('category/<slug:slug>/', CategoryDetailAPIView.as_view(), name='category-detail'),
 
     #blog
     path('blogs/', views.BlogListCreateAPIView.as_view(), name='create_blog'),

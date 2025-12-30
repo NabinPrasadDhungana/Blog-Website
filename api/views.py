@@ -127,24 +127,78 @@ class UserDetailAPIView(APIView):
 #         else:
 #             return [IsAdminUser()]
         
-class CategoryListAPIView(ListAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [AllowAny]
-    lookup_field = 'slug'
+# class CategoryListAPIView(ListAPIView):
+#     queryset = Category.objects.all()
+#     serializer_class = CategorySerializer
+#     permission_classes = [AllowAny]
+#     lookup_field = 'slug'
 
-class CategoryCreateAPIView(CreateAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [IsAdminUser]
-    lookup_field = 'slug'
+# class CategoryCreateAPIView(CreateAPIView):
+#     queryset = Category.objects.all()
+#     serializer_class = CategorySerializer
+#     permission_classes = [IsAdminUser]
+#     lookup_field = 'slug'
 
-class CategoryRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [IsAdminUser]
-    lookup_field = 'slug'
-    lookup_url_kwarg = 'slug'
+# class CategoryRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+#     queryset = Category.objects.all()
+#     serializer_class = CategorySerializer
+#     permission_classes = [IsAdminUser]
+#     lookup_field = 'slug'
+#     lookup_url_kwarg = 'slug'
+
+class CategoryListCreateAPIView(APIView):
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            self.permission_classes = [AllowAny]
+        else:
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()
+    
+    def get(self, request):
+        category = Category.objects.all()
+        serializer = CategorySerializer(category, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class CategoryDetailAPIView(APIView):
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            self.permission_classes = [AllowAny]
+        else:
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()
+    
+    def get(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        serializer = CategorySerializer(category)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def put(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        serializer = CategorySerializer(category, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        serializer = CategorySerializer(category, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        category.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
         
 # class BlogViewSet(viewsets.ModelViewSet):
 #     queryset = Blog.objects.all()

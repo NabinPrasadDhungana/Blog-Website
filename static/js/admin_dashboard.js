@@ -11,7 +11,7 @@ async function toggleUserStatus(userId, activate) {
 
     try {
         const token = TokenManager.getAccessToken();
-        const response = await fetch(`/api/user/update/${userId}/`, {
+        const response = await fetch(`/api/user/${userId}/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 const token = TokenManager.getAccessToken();
-                const response = await fetch('/api/category/create/', {
+                const response = await fetch('/api/categories/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
